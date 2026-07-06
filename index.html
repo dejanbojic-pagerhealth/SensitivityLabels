@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sensitivity Labels — Pager Health</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style> 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f6f3;
+  --surface:   #ffffff;
+  --border:    #e4e1d9;
+  --text:      #1a1916;
+  --muted:     #6b6860;
+  --faint:     #f0ede8;
+
+  --plum:      #360057;
+  --tangerine: #FF8200;
+
+  --pub:       #2d6a2d;
+  --pub-bg:    #edf4ed;
+  --pub-border:#b8d8b8;
+
+  --int:       #1a4d7a;
+  --int-bg:    #e8f0f8;
+  --int-border:#a8c4e0;
+
+  --conf:      #7a4a00;
+  --conf-bg:   #fdf3e3;
+  --conf-border:#e8c87a;
+
+  --rest:      #8b1a1a;
+  --rest-bg:   #fdf0f0;
+  --rest-border:#e8a8a8;
+
+  --radius:    10px;
+  --mono:      'DM Mono', monospace;
+  --sans:      'Inter', sans-serif;
+  --serif:     'Frank Ruhl Libre', serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Header */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo-mark {
+  width: 54px; height: 54px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-mark img { width: 100%; height: 100%; object-fit: contain; }
+.site-header h1 { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; color: var(--plum); }
+.site-header .subtitle { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+/* Nav tabs 2025 */
+.tab-bar {
+  background: var(--plum);
+  border-bottom: 1px solid var(--plum);
+  padding: 0 32px;
+  display: flex;
+  overflow-x: auto;
+}
+.tab {
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color .15s, background-color .15s, font-weight .15s, border-color .15s;
+  background: none;
+  font-family: var(--sans);
+}
+.tab:hover { color: var(--plum); background: #ffffff; font-weight: 700; }
+.tab.active { color: #ffffff; font-weight: 700; border-bottom-color: var(--tangerine); }
+.tab.active:hover { color: var(--plum); background: #ffffff; border-bottom-color: var(--tangerine); }
+
+/* Layout */
+.main { max-width: 860px; margin: 0 auto; padding: 32px 24px 72px; }
+.panel { display: none; }
+.panel.active { display: block; }
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+/* Label cards */
+.labels-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+
+.label-card {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+}
+.label-card.lc-pub  { border-left-color: var(--pub); }
+.label-card.lc-int  { border-left-color: var(--int); }
+.label-card.lc-conf { border-left-color: var(--conf); }
+.label-card.lc-rest { border-left-color: var(--rest); }
+
+.label-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .1s;
+}
+.lc-pub  .label-card-header { background: var(--pub-bg); }
+.lc-int  .label-card-header { background: var(--int-bg); }
+.lc-conf .label-card-header { background: var(--conf-bg); }
+.lc-rest .label-card-header { background: var(--rest-bg); }
+
+.lc-pub  .label-card-header:hover { background: #daeeda; }
+.lc-int  .label-card-header:hover { background: #d0e5f5; }
+.lc-conf .label-card-header:hover { background: #f5e4c4; }
+.lc-rest .label-card-header:hover { background: #f5d8d8; }
+
+.label-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.dot-pub  { background: var(--pub); }
+.dot-int  { background: var(--int); }
+.dot-conf { background: var(--conf); }
+.dot-rest { background: var(--rest); }
+
+.label-name { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; flex: 1; }
+.lc-pub  .label-name { color: var(--pub); }
+.lc-int  .label-name { color: var(--int); }
+.lc-conf .label-name { color: var(--conf); }
+.lc-rest .label-name { color: var(--rest); }
+
+.label-tagline { font-size: 13px; color: var(--muted); flex: 2; }
+.label-chevron { color: var(--muted); font-size: 17px; transition: transform .2s; flex-shrink: 0; }
+.label-card.open .label-chevron { transform: rotate(180deg); }
+
+.label-card-body {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 20px;
+  background: var(--surface);
+}
+.label-card.open .label-card-body { display: block; }
+
+.label-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  letter-spacing: .02em;
+}
+.pill-pub  { background: var(--pub-bg);  color: var(--pub);  border: 1px solid var(--pub-border); }
+.pill-int  { background: var(--int-bg);  color: var(--int);  border: 1px solid var(--int-border); }
+.pill-conf { background: var(--conf-bg); color: var(--conf); border: 1px solid var(--conf-border); }
+.pill-rest { background: var(--rest-bg); color: var(--rest); border: 1px solid var(--rest-border); }
+
+.body-desc { font-size: 14px; color: var(--text); margin-bottom: 16px; line-height: 1.65; }
+
+.examples-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--muted); margin-bottom: 8px;
+}
+.examples-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.example-tag {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+/* Sub-labels */
+.sublabels-wrap { margin-top: 16px; }
+.sublabels-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--muted); margin-bottom: 8px;
+}
+.sublabel-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.sublabel-icon { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.sublabel-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.sublabel-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* Decision tool */
+.decision-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+.decision-title { font-family: var(--serif); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 6px; color: var(--plum); }
+.decision-sub   { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+.question-block { margin-bottom: 22px; }
+.question-text  { font-size: 14px; font-weight: 500; margin-bottom: 12px; line-height: 1.55; }
+.q-options { display: flex; gap: 10px; }
+.q-btn {
+  padding: 8px 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--faint);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+}
+.q-btn:hover { border-color: var(--plum); background: var(--surface); }
+.q-btn.sel-yes { border-color: var(--pub); background: var(--pub-bg); color: var(--pub); }
+.q-btn.sel-no  { border-color: #999; background: var(--faint); color: var(--muted); }
+
+.result-box {
+  display: none;
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1.5px solid;
+}
+.result-box.show { display: block; }
+.result-box.r-pub  { background: var(--pub-bg);  border-color: var(--pub-border); }
+.result-box.r-int  { background: var(--int-bg);  border-color: var(--int-border); }
+.result-box.r-conf { background: var(--conf-bg); border-color: var(--conf-border); }
+.result-box.r-rest { background: var(--rest-bg); border-color: var(--rest-border); }
+
+.result-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
+.result-box.r-pub  .result-label { color: var(--pub); }
+.result-box.r-int  .result-label { color: var(--int); }
+.result-box.r-conf .result-label { color: var(--conf); }
+.result-box.r-rest .result-label { color: var(--rest); }
+.result-name { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
+.result-desc { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.55; }
+.reset-btn {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  padding: 6px 14px; font-size: 13px; font-family: var(--sans);
+  color: var(--muted); cursor: pointer;
+}
+.reset-btn:hover { color: var(--plum); border-color: var(--plum); }
+
+/* Downgrade panel */
+.downgrade-intro {
+  font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.65;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px;
+}
+.downgrade-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.downgrade-option {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px;
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.dg-radio {
+  width: 16px; height: 16px; border: 2px solid var(--border);
+  border-radius: 50%; flex-shrink: 0; margin-top: 3px; background: var(--faint);
+}
+.dg-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.dg-desc  { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+.downgrade-warn {
+  background: #fff8e8; border: 1px solid #e8c87a;
+  border-radius: var(--radius); padding: 14px 18px;
+  font-size: 13px; color: #6b4f00;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.warn-icon { flex-shrink: 0; margin-top: 1px; }
+
+/* Help panel */
+.help-intro { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.65; }
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.contact-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 18px;
+}
+.contact-scenario { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 5px; }
+.contact-name     { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.contact-detail   { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+.contact-link {
+  display: inline-block; padding: 6px 14px;
+  background: var(--faint); border: 1px solid var(--border);
+  border-radius: 6px; font-size: 12px; font-weight: 500;
+  color: var(--text); text-decoration: none; transition: all .15s;
+}
+.contact-link:hover { background: var(--plum); color: #fff; border-color: var(--plum); }
+
+@media (max-width: 600px) {
+  .site-header { padding: 14px 16px; }
+  .site-header .subtitle { display: none; }
+  .tab-bar { padding: 0 8px; }
+  .tab { padding: 10px 12px; font-size: 12px; }
+  .main { padding: 20px 14px 56px; }
+  .label-tagline { display: none; }
+  .decision-card { padding: 18px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-mark">
+    <img src="images/PH_Icon_Only_Digital-01.png" alt="Pager Health logo">
+  </div>
+  <h1>Sensitivity Labels</h1>
+  <span class="subtitle">Pager Health &mdash; Quick Reference</span>
+</header>
+
+<nav class="tab-bar">
+  <button class="tab active" onclick="showTab('labels',this)">Label guide</button>
+  <button class="tab" onclick="showTab('decide',this)">Which label?</button>
+  <button class="tab" onclick="showTab('downgrade',this)">Changing a label</button>
+  <button class="tab" onclick="showTab('help',this)">Get help</button>
+</nav>
+
+<main class="main">
+
+<!-- LABEL GUIDE -->
+<div id="panel-labels" class="panel active">
+  <p class="section-title">All labels &mdash; click to expand</p>
+  <div class="labels-grid">
+
+    <!-- PUBLIC -->
+    <div class="label-card lc-pub" id="card-pub">
+      <div class="label-card-header" onclick="toggleCard('card-pub')">
+        <span class="label-dot dot-pub"></span>
+        <span class="label-name">Public</span>
+        <span class="label-tagline">Approved for sharing with anyone inside or outside Pager Health</span>
+        <span class="label-chevron">&#8964;</span>
+      </div>
+      <div class="label-card-body">
+        <span class="label-pill pill-pub">Public</span>
+        <p class="body-desc">Use this label for content that has been deliberately prepared and approved for public distribution. There is no confidentiality concern &mdash; sharing this content externally causes no harm to Pager Health.</p>
+        <p class="examples-label">Typical examples</p>
+        <div class="examples-list">
+          <span class="example-tag">Press releases</span>
+          <span class="example-tag">Public website content</span>
+          <span class="example-tag">Published job postings</span>
+          <span class="example-tag">Marketing materials</span>
+          <span class="example-tag">Public product documentation</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERNAL -->
+    <div class="label-card lc-int" id="card-int">
+      <div class="label-card-header" onclick="toggleCard('card-int')">
+        <span class="label-dot dot-int"></span>
+        <span class="label-name">Internal</span>
+        <span class="label-tagline">Day-to-day Pager Health content &mdash; keep within the organisation</span>
+        <span class="label-chevron">&#8964;</span>
+      </div>
+      <div class="label-card-body">
+        <span class="label-pill pill-int">Internal</span>
+        <p class="body-desc">Use this label for general business content intended for use within Pager Health. Sharing it externally could create a confidentiality risk, but the content does not include sensitive personal data or business-critical information. This is the <strong>default label</strong> applied to new documents.</p>
+        <p class="examples-label">Typical examples</p>
+        <div class="examples-list">
+          <span class="example-tag">Internal memos</span>
+          <span class="example-tag">Team meeting notes</span>
+          <span class="example-tag">Internal process documents</span>
+          <span class="example-tag">Project plans</span>
+          <span class="example-tag">Internal training materials</span>
+          <span class="example-tag">Org charts</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIDENTIAL -->
+    <div class="label-card lc-conf" id="card-conf">
+      <div class="label-card-header" onclick="toggleCard('card-conf')">
+        <span class="label-dot dot-conf"></span>
+        <span class="label-name">Confidential</span>
+        <span class="label-tagline">Sensitive content &mdash; a breach would cause harm to Pager Health</span>
+        <span class="label-chevron">&#8964;</span>
+      </div>
+      <div class="label-card-body">
+        <span class="label-pill pill-conf">Confidential</span>
+        <p class="body-desc">Use this label for content specifically intended for internal employees or approved external parties. A breach of confidentiality would cause meaningful harm to Pager Health, its employees, or its partners. This includes personal information, financial data, legal documents, and other sensitive business content that should not be shared outside the organisation without approval.</p>
+        <p class="examples-label">Typical examples</p>
+        <div class="examples-list">
+          <span class="example-tag">Employee personal records</span>
+          <span class="example-tag">Contracts and legal agreements</span>
+          <span class="example-tag">Financial reports</span>
+          <span class="example-tag">Partner or vendor agreements</span>
+          <span class="example-tag">Internal audit findings</span>
+          <span class="example-tag">Salary and compensation data</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESTRICTED -->
+    <div class="label-card lc-rest" id="card-rest">
+      <div class="label-card-header" onclick="toggleCard('card-rest')">
+        <span class="label-dot dot-rest"></span>
+        <span class="label-name">Restricted</span>
+        <span class="label-tagline">Highest sensitivity &mdash; a breach would cause serious harm</span>
+        <span class="label-chevron">&#8964;</span>
+      </div>
+      <div class="label-card-body">
+        <span class="label-pill pill-rest">Restricted</span>
+        <p class="body-desc">Use this label for the most sensitive information at Pager Health. A breach would cause serious harm &mdash; legal, regulatory, or reputational. This includes protected health information (PHI) under HIPAA, credentials, and strategic business data. Choose the sub-label that best describes the content type.</p>
+        <div class="sublabels-wrap">
+          <p class="sublabels-label">Sub-labels</p>
+          <div class="sublabel-row">
+            <span class="sublabel-icon" style="background:var(--rest)"></span>
+            <div>
+              <div class="sublabel-name">Restricted / PHI</div>
+              <div class="sublabel-desc">Protected health information covered by HIPAA &mdash; patient records, clinical notes, treatment data, or any information that identifies an individual in a health context.</div>
+            </div>
+          </div>
+          <div class="sublabel-row">
+            <span class="sublabel-icon" style="background:var(--rest)"></span>
+            <div>
+              <div class="sublabel-name">Restricted / Credentials</div>
+              <div class="sublabel-desc">Passwords, API keys, certificates, access tokens, or any authentication material. Never store credentials in documents &mdash; use a password manager or secrets vault.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DECISION TOOL -->
+<div id="panel-decide" class="panel">
+  <div class="decision-card">
+    <p class="decision-title">Which label should I use?</p>
+    <p class="decision-sub">Answer a few questions to get a recommendation.</p>
+
+    <div class="question-block" id="q1">
+      <p class="question-text">1. Does the content include protected health information (PHI), credentials, or strategic data whose exposure would cause serious harm to Pager Health?</p>
+      <div class="q-options">
+        <button class="q-btn" onclick="answer(1,'yes',this)">Yes</button>
+        <button class="q-btn" onclick="answer(1,'no',this)">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" id="q2" style="display:none">
+      <p class="question-text">2. Does the content include personal information, financial data, or details shared with specific named parties under a confidentiality expectation?</p>
+      <div class="q-options">
+        <button class="q-btn" onclick="answer(2,'yes',this)">Yes</button>
+        <button class="q-btn" onclick="answer(2,'no',this)">No</button>
+      </div>
+    </div>
+
+    <div class="question-block" id="q3" style="display:none">
+      <p class="question-text">3. Has this content been reviewed and approved for release outside Pager Health?</p>
+      <div class="q-options">
+        <button class="q-btn" onclick="answer(3,'yes',this)">Yes</button>
+        <button class="q-btn" onclick="answer(3,'no',this)">No</button>
+      </div>
+    </div>
+
+    <div class="result-box r-rest" id="res-restricted">
+      <p class="result-label">Recommended label</p>
+      <p class="result-name">Restricted</p>
+      <p class="result-desc">Select the appropriate sub-label: <strong>Restricted / PHI</strong> for health information, <strong>Restricted / Credentials</strong> for passwords or keys.</p>
+      <button class="reset-btn" onclick="resetDecision()">Start over</button>
+    </div>
+    <div class="result-box r-conf" id="res-confidential">
+      <p class="result-label">Recommended label</p>
+      <p class="result-name">Confidential</p>
+      <p class="result-desc">Use this label for personal data, financial records, legal documents, or other sensitive content that should not leave Pager Health without approval.</p>
+      <button class="reset-btn" onclick="resetDecision()">Start over</button>
+    </div>
+    <div class="result-box r-pub" id="res-public">
+      <p class="result-label">Recommended label</p>
+      <p class="result-name">Public</p>
+      <p class="result-desc">This content is approved for external distribution. No additional restrictions apply.</p>
+      <button class="reset-btn" onclick="resetDecision()">Start over</button>
+    </div>
+    <div class="result-box r-int" id="res-internal">
+      <p class="result-label">Recommended label</p>
+      <p class="result-name">Internal</p>
+      <p class="result-desc">Standard label for Pager Health business content. Keep within the organisation.</p>
+      <button class="reset-btn" onclick="resetDecision()">Start over</button>
+    </div>
+  </div>
+</div>
+
+<!-- DOWNGRADE -->
+<div id="panel-downgrade" class="panel">
+  <p class="section-title">Changing a label to a lower classification</p>
+
+  <div class="downgrade-intro">
+    When you apply a label with a lower classification than the current one &mdash; for example, changing a document from <strong>Confidential</strong> to <strong>Internal</strong> &mdash; Pager Health requires a justification. A dialog will appear asking you to select one of the following options.
+  </div>
+
+  <div class="downgrade-options">
+
+    <div class="downgrade-option">
+      <div class="dg-radio"></div>
+      <div>
+        <div class="dg-title">Previous label no longer applies</div>
+        <div class="dg-desc">The content has changed or its context has shifted so that the original label is no longer appropriate. For example, a document that contained draft financial projections has been revised to remove all sensitive figures.</div>
+      </div>
+    </div>
+
+    <div class="downgrade-option">
+      <div class="dg-radio"></div>
+      <div>
+        <div class="dg-title">Previous label was incorrect</div>
+        <div class="dg-desc">The original label was applied in error &mdash; the content never required that level of classification. Use this when correcting a labeling mistake rather than responding to a content change.</div>
+      </div>
+    </div>
+
+    <div class="downgrade-option">
+      <div class="dg-radio"></div>
+      <div>
+        <div class="dg-title">Other (explain) &mdash; Do not enter sensitive information</div>
+        <div class="dg-desc">Neither of the above options fits. You will be asked to type a brief explanation in your own words. Do not include personal data, credentials, or any sensitive content in this field &mdash; it is recorded in the audit log and visible to the Information Security team.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="downgrade-warn">
+    <span class="warn-icon">&#9888;</span>
+    <div>All label changes are recorded in the Microsoft Purview audit log. If you are unsure whether a downgrade is appropriate, contact the Information Security team before making the change.</div>
+  </div>
+</div>
+
+<!-- HELP -->
+<div id="panel-help" class="panel">
+  <p class="help-intro">Not sure which label to use, or having a problem with a labeled document? Reach out to the right team below.</p>
+  <div class="contact-grid">
+
+    <div class="contact-card">
+      <p class="contact-scenario">Label choice questions</p>
+      <p class="contact-name">Information Security</p>
+      <p class="contact-detail">Questions about which label applies to a specific document or data type.</p>
+      <a class="contact-link" href="mailto:infosec@pagerhealth.com">Email InfoSec</a>
+    </div>
+
+    <div class="contact-card">
+      <p class="contact-scenario">PHI / HIPAA guidance</p>
+      <p class="contact-name">Compliance Team</p>
+      <p class="contact-detail">Questions about whether content qualifies as Protected Health Information under HIPAA.</p>
+      <a class="contact-link" href="mailto:compliance@pagerhealth.com">Email Compliance</a>
+    </div>
+
+    <div class="contact-card">
+      <p class="contact-scenario">Technical issues</p>
+      <p class="contact-name">IT Help Desk</p>
+      <p class="contact-detail">Labels not appearing in Office, errors opening a labeled file, or other technical problems.</p>
+      <a class="contact-link" href="mailto:helpIT@pagerhealth.com">Email IT Help Desk</a>
+    </div>
+
+    <div class="contact-card">
+      <p class="contact-scenario">Sensitive data exposed</p>
+      <p class="contact-name">Information Security &mdash; Urgent</p>
+      <p class="contact-detail">If you believe PHI, credentials, or other restricted data has been shared inappropriately, report immediately.</p>
+      <a class="contact-link" href="mailto:infosec@pagerhealth.com">Report incident</a>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('panel-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleCard(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+var answers = {};
+function answer(q, val, btn) {
+  answers[q] = val;
+  btn.closest('.question-block').querySelectorAll('.q-btn').forEach(function(b){
+    b.classList.remove('sel-yes','sel-no');
+  });
+  btn.classList.add(val === 'yes' ? 'sel-yes' : 'sel-no');
+  hideResults();
+  var q2 = document.getElementById('q2');
+  var q3 = document.getElementById('q3');
+  if (q2) q2.style.display = 'none';
+  if (q3) q3.style.display = 'none';
+  if (q === 1 && val === 'yes') { showResult('res-restricted');  return; }
+  if (q === 1 && val === 'no')  { if(q2) q2.style.display='block'; return; }
+  if (q === 2 && val === 'yes') { showResult('res-confidential'); return; }
+  if (q === 2 && val === 'no')  { if(q3) q3.style.display='block'; return; }
+  if (q === 3 && val === 'yes') { showResult('res-public');       return; }
+  if (q === 3 && val === 'no')  { showResult('res-internal');     return; }
+}
+function hideResults() {
+  document.querySelectorAll('.result-box').forEach(function(r){ r.classList.remove('show'); });
+}
+function showResult(id) {
+  hideResults();
+  var el = document.getElementById(id);
+  if (el) el.classList.add('show');
+}
+function resetDecision() {
+  answers = {};
+  hideResults();
+  ['q2','q3'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.querySelectorAll('.q-btn').forEach(function(b){
+    b.classList.remove('sel-yes','sel-no');
+  });
+}
+</script>
+</body>
+</html>
