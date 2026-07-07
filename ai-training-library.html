@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AI Training Library &mdash; Pager Health</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --plum:#360057;--plum-light:#4a0075;--plum-pale:#f3eef7;--plum-mid:#6b2d8b;
+  --ai-magic:#5400FF;--ai-magic-pale:#eeebff;--ai-magic-dark:#3d00cc;
+  --tangerine:#FF8200;--tangerine-pale:#fff3e0;--tangerine-dark:#c96500;
+  --light-grey:#F5F5F5;--white:#ffffff;
+  --text-primary:#1a0a24;--text-secondary:#5a4a6a;--text-muted:#9a8aaa;
+  --border:rgba(54,0,87,0.1);--border-strong:rgba(54,0,87,0.2);
+  --radius:8px;
+  --ff-head:'Frank Ruhl Libre',Georgia,serif;
+  --ff-body:'Inter','Segoe UI',system-ui,sans-serif;
+}
+body{font-family:var(--ff-body);background:var(--light-grey);color:var(--text-primary);min-height:100vh}
+
+/* Topbar */
+.topbar{background:var(--white);border-bottom:2px solid var(--plum);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(54,0,87,0.06)}
+.topbar-right{font-size:12px;color:var(--text-muted)}
+
+/* Main */
+.main{padding:2rem;max-width:1200px;margin:0 auto}
+.page-title{font-family:var(--ff-head);font-size:28px;font-weight:400;color:var(--plum);margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--text-secondary);margin-bottom:1.75rem}
+
+/* Spotlight */
+.spotlight-section{margin-bottom:2rem}
+.spotlight-label{font-family:var(--ff-body);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tangerine-dark);margin-bottom:.875rem;display:flex;align-items:center;gap:6px}
+.spotlight-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.spotlight-card{
+  background:linear-gradient(135deg,var(--plum) 0%,var(--plum-light) 100%);
+  border-radius:14px;padding:1.375rem 1.5rem;
+  display:flex;flex-direction:column;gap:10px;
+  text-decoration:none;color:var(--white);
+  transition:all .15s;position:relative;overflow:hidden;
+}
+.spotlight-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:120px;height:120px;border-radius:50%;
+  background:rgba(255,130,0,0.15);pointer-events:none;
+}
+.spotlight-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(54,0,87,0.25)}
+.spotlight-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.spotlight-ico{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.spotlight-badge{font-size:11px;padding:3px 9px;border-radius:10px;font-weight:500;background:rgba(255,130,0,0.25);color:#FFD0A0;border:1px solid rgba(255,130,0,0.3)}
+.spotlight-title{font-size:15px;font-weight:600;line-height:1.4;color:var(--white)}
+.spotlight-desc{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5}
+.spotlight-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.spotlight-source{font-size:12px;color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:5px}
+.spotlight-cta{font-size:12px;font-weight:500;color:rgba(255,255,255,0.85);display:flex;align-items:center;gap:4px}
+
+/* Search */
+.srow{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+input[type=text]{flex:1;height:40px;padding:0 14px;border:1.5px solid var(--border-strong);border-radius:var(--radius);background:var(--white);color:var(--text-primary);font-family:var(--ff-body);font-size:14px;outline:none;transition:border-color .15s}
+input[type=text]:focus{border-color:var(--ai-magic)}
+input[type=text]::placeholder{color:var(--text-muted)}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.5rem}
+.tab{padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;color:var(--text-secondary);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;font-family:var(--ff-body);background:none;border-left:none;border-right:none;border-top:none;height:auto}
+.tab.active{color:var(--plum);border-bottom-color:var(--plum)}
+.tab:hover:not(.active){color:var(--plum);background:none}
+
+/* Filters */
+.frow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center}
+.dvd{width:1px;height:24px;background:var(--border-strong);flex-shrink:0}
+.pill{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:1.5px solid var(--border-strong);background:var(--white);color:var(--text-secondary);transition:all .15s;white-space:nowrap;user-select:none;font-family:var(--ff-body)}
+.pill:hover:not(.active){background:var(--plum-pale);border-color:var(--plum);color:var(--plum)}
+.pill.active{background:var(--ai-magic-pale);color:var(--ai-magic);border-color:var(--ai-magic);font-weight:500}
+.pill.sbeg.active{background:#f0fdf4;color:#166534;border-color:#86efac}
+.pill.sint.active{background:var(--tangerine-pale);color:var(--tangerine-dark);border-color:var(--tangerine)}
+.pill.sadv.active{background:var(--plum-pale);color:var(--plum);border-color:var(--plum-mid)}
+
+/* Section labels */
+.slbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--plum-mid);margin:1.75rem 0 .875rem;display:flex;align-items:center;gap:8px}
+.cbadge{background:var(--plum-pale);border:1px solid var(--border);border-radius:10px;font-size:11px;padding:2px 8px;color:var(--plum-mid);text-transform:none;letter-spacing:0;font-weight:400}
+
+/* Library cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+a.card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:1.125rem 1.25rem;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit}
+a.card:hover{border-color:var(--ai-magic);box-shadow:0 2px 12px rgba(84,0,255,0.08);transform:translateY(-1px)}
+a.card.nc{border-color:var(--tangerine)}
+.ctop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.cico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ii{background:var(--ai-magic-pale);color:var(--ai-magic)}
+.ie{background:#f0fdf4;color:#166534}
+.bdgs{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.bdg{font-size:11px;padding:3px 9px;border-radius:10px;font-weight:500;white-space:nowrap;font-family:var(--ff-body)}
+.bi{background:var(--ai-magic-pale);color:var(--ai-magic)}
+.be{background:#f0fdf4;color:#166534}
+.bn{background:var(--tangerine-pale);color:var(--tangerine-dark)}
+.bb{background:#f0fdf4;color:#166534}
+.bim{background:var(--tangerine-pale);color:var(--tangerine-dark)}
+.bad{background:var(--plum-pale);color:var(--plum)}
+.ctitle{font-size:14px;font-weight:600;line-height:1.4;color:var(--text-primary)}
+.cdesc{font-size:13px;color:var(--text-secondary);line-height:1.55}
+.cmeta{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);margin-top:2px;flex-wrap:wrap}
+.mdot{color:var(--border-strong)}
+.empty{text-align:center;padding:4rem 0;color:var(--text-muted);font-size:14px}
+
+/* Learning paths */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.pcard{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:1.25rem;display:flex;flex-direction:column;gap:12px}
+.phdr{display:flex;align-items:center;gap:12px}
+.pico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ptitle{font-family:var(--ff-head);font-size:16px;font-weight:500;color:var(--plum)}
+.psub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.psteps{display:flex;flex-direction:column;gap:6px}
+.pstep{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.4}
+.pstep a{color:var(--ai-magic);text-decoration:none;font-weight:500;transition:color .15s}
+.pstep a:hover{color:var(--plum);text-decoration:underline}
+.snum{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px}
+.pftr{display:flex;align-items:center;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px}
+
+/* Footer */
+.footer{text-align:center;padding:2rem;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:3rem}
+
+@media(max-width:640px){
+  .main{padding:1rem}.topbar{padding:0 1rem}
+  .cards{grid-template-columns:1fr}.pgrid{grid-template-columns:1fr}
+  .spotlight-grid{grid-template-columns:1fr}.frow{gap:6px}
+  .page-title{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="230 312 1000 160" style="height:36px;width:auto;display:block;" aria-label="pagerhealth">
+  <defs>
+    <style>
+      .st0 {
+        fill: #360057;
+      }
+
+      .st1 {
+        fill: #fff;
+      }
+
+      .st2 {
+        fill: #4a106e;
+      }
+
+      .st3 {
+        fill: #ff8200;
+      }
+    </style>
+  </defs>
+  <g>
+    <path class="st0" d="M1199.6,424.5h-7.6v-48.1c0-13.6-6.9-17.4-17.1-17.4s-18.4,5.7-23,12.1v53.4h-7.6v-97.6h7.6v37.6c5.1-6.1,15.2-12.4,25.5-12.4s22.2,6.7,22.2,22.7v49.7h0Z"/>
+    <path class="st0" d="M1119.4,426.2c-9.4,0-13.9-5.7-13.9-15.4v-50.3h-11.7v-6.7h11.7v-19.3h7.8v19.3h14.3v6.7h-14.3v49.1c0,5.7,2.3,9.7,7.3,9.7s6.3-1.6,7.9-3.4l2.9,5.8c-2.8,2.6-6.1,4.4-12,4.4h0Z"/>
+    <rect class="st0" x="1072.7" y="326.9" width="7.6" height="97.6"/>
+    <path class="st0" d="M1020,420.2c8.5,0,16.4-3.2,21.4-9.7v-15.5c-5-6.6-12.9-9.8-21.4-9.8s-19.3,7.5-19.3,17.6,7.8,17.4,19.3,17.4ZM1049,424.5h-7.6v-8.3c-6.3,6.9-14.2,10.1-24,10.1s-24.7-8.3-24.7-23.5,12.4-23.4,24.7-23.4,17.8,3.2,24,10.1v-14.3c0-10.5-8.5-16.2-18.9-16.2s-15.8,3.1-22.2,10.4l-4.2-5.3c7.3-7.9,15.5-11.8,27.2-11.8s25.7,6.9,25.7,22.7v49.7-.2h0Z"/>
+    <path class="st0" d="M969,385.5c0-12-8-26.9-25.7-26.9s-25,14.6-25.6,26.9h51.3ZM944.8,426.2c-20.6,0-35.3-15.4-35.3-37.2s14.3-37,33.9-37,33.3,17,33.3,37.4v2h-59.1c.7,15.4,11,28.1,27.6,28.1s17.1-3.4,23.1-9.8l3.9,5c-7,7.3-15.9,11.4-27.6,11.4h.2,0Z"/>
+    <path class="st0" d="M889.8,424.5h-7.6v-48.1c0-13.6-6.9-17.4-17.1-17.4s-18.4,5.7-23,12.1v53.4h-7.6v-97.6h7.6v37.6c5.1-6.1,15.2-12.4,25.5-12.4s22.2,6.7,22.2,22.7v49.7h0Z"/>
+    <path class="st0" d="M785,424.5h-15.4v-70.7h15.4v10.2c5.4-6.7,13.9-12,23-12v15.2c-1.3-.3-2.8-.4-4.7-.4-6.6,0-15.2,4.4-18.3,9.5v48.1h0Z"/>
+    <path class="st0" d="M739.7,383.2c-.4-8.3-6.1-18.6-20-18.6s-19.2,10.1-19.7,18.6h39.8,0ZM721,426.2c-21.4,0-37-14.8-37-37.2s14.9-37,35.8-37,34.7,16.1,34.7,38.3v3.8h-54.4c1.2,10.5,9.1,19.5,22.4,19.5s15.1-2.8,20.2-7.9l7,10.1c-7.2,6.7-17.6,10.4-28.7,10.4h0Z"/>
+    <path class="st0" d="M634.8,410.9c7.2,0,14.6-4.2,18.1-9.4v-26.5c-3.5-5.1-11-9.4-18.1-9.4-12.3,0-20,9.1-20,22.7s7.8,22.5,20,22.5h0ZM632.1,453.1c-12,0-20.9-2.6-29.7-10.5l7.2-11.1c5.9,6.6,13.2,9.1,22.5,9.1s20.9-4.7,20.9-19.7v-8c-5.4,7.2-13.5,11.9-22.7,11.9-18,0-31.3-13-31.3-36.3s13-36.3,31.3-36.3,17,3.9,22.7,11.6v-9.8h15.4v67c0,25.5-19,32.3-36.3,32.3v-.2h0Z"/>
+    <path class="st0" d="M551.1,415.7c6.6,0,13.2-2.5,16.8-7.3v-10.8c-3.7-4.8-10.2-7.3-16.8-7.3s-15.2,5.1-15.2,12.7,6.6,12.7,15.2,12.7h0ZM583.3,424.5h-15.4v-7.8c-5.3,6.1-13.6,9.5-23,9.5s-24.4-7.9-24.4-23.4,12.9-23.1,24.4-23.1,17.7,3.1,23,9.1v-10.5c0-8.2-6.9-13.2-16.5-13.2s-14.9,2.9-20.9,9.1l-6.4-10.7c8.2-7.9,18.4-11.4,29.7-11.4s29.6,6.6,29.6,25.5v47h0Z"/>
+    <path class="st0" d="M473.5,412.6c12.1,0,20-9.8,20-23.6s-7.9-23.4-20-23.4-14.6,4.1-18.1,9.4v27.9c3.4,5.3,11,9.7,18.1,9.7ZM478,426.2c-8.9,0-16.8-4.1-22.7-11.6v36.7h-15.4v-97.6h15.4v9.7c5.3-7,13.5-11.4,22.7-11.4,18.3,0,31.3,13.8,31.3,37s-13,37.2-31.3,37.2h0Z"/>
+    <path class="st0" d="M288.1,317.6c-23,0-41.7,18.6-41.7,41.6v63.6c0,23,18.7,41.6,41.7,41.6h14.2s0,.2.1.2l13.3,23c1.9,3.2,6.5,3.2,8.4,0l13.3-23s0-.2.1-.2h14.2c23,0,41.7-18.6,41.7-41.6v-63.6c0-23-18.7-41.6-41.7-41.6h-63.7.1Z"/>
+    <path class="st3" d="M307.8,369.6c2.4-4,1.9-9.3-1.5-12.8-4.1-4.1-10.7-4.1-14.7,0-3.4,3.4-4,8.6-1.7,12.5l-6.8,6.8c-4-2.3-9.1-1.7-12.5,1.7-4.1,4.1-4.1,10.7,0,14.7,4.1,4.1,10.7,4.1,14.7,0,3.4-3.4,4-8.6,1.7-12.5l6.8-6.8c3.1,1.8,7,1.8,10.1.1l6.9,6.9c-2.1,4-1.5,9,1.8,12.3s10.7,4.1,14.7,0c3.5-3.5,4-8.9,1.4-13l.3.3,6.7-6.7c4,2.3,9.2,1.8,12.6-1.6s4.1-10.7,0-14.7c-4.1-4.1-10.7-4.1-14.7,0-3.4,3.4-4,8.5-1.7,12.5l-6.7,6.7.4.4c-3.3-2.1-7.6-2.2-11-.1l-6.7-6.7h0Z"/>
+    <path class="st1" d="M369.2,377.8c4.1,4.1,4.1,10.7,0,14.7-3.4,3.4-8.6,4-12.5,1.7l-6.8,6.8c2.3,4,1.7,9.1-1.7,12.5-3.4,3.4-8.6,4-12.5,1.7l-6.8,6.8c2.3,4,1.7,9.1-1.7,12.5-4.1,4.1-10.7,4.1-14.7,0-3.4-3.4-4-8.6-1.7-12.5l-6.8-6.8c-4,2.3-9.1,1.7-12.5-1.7-4.1-4.1-4.1-10.7,0-14.7,4.1-4.1,10.7-4.1,14.7,0,3.4,3.4,4,8.6,1.7,12.5l6.8,6.8c3.2-1.8,7.2-1.8,10.4,0l6.8-6.8c-2.3-4-1.7-9.1,1.7-12.5,3.4-3.4,8.6-4,12.5-1.7l6.8-6.8c-2.3-4-1.7-9.1,1.7-12.5,4.1-4.1,10.7-4.1,14.7,0h-.1Z"/>
+  </g>
+  <g>
+    <path class="st2" d="M1217.9,345.6c-1.4,0-2.5-.2-3.5-.7s-1.9-1-2.4-1.9-.8-1.9-1-2.9h2.9c0,.7.3,1.2.7,1.7s.8.8,1.5,1,1.2.3,2,.3,1.5,0,2-.3,1-.7,1.5-1,.5-1,.5-1.5,0-1-.5-1.4-.7-.7-1.2-.8-1.2-.5-1.9-.7l-2.2-.7c-1.5-.3-2.7-1-3.5-1.9s-1.4-1.9-1.4-3,.3-2,.8-2.9,1.4-1.4,2.4-1.9,2-.7,3.4-.7,2.4.2,3.4.7,1.7,1,2.2,1.9.8,1.7.8,2.7h-2.7c0-.8-.5-1.5-1.2-2s-1.5-.7-2.7-.7-1.4,0-2,.3-1,.5-1.4,1-.5.8-.5,1.4.2,1,.5,1.4.8.7,1.4.8,1,.3,1.5.5l1.9.5c.5,0,1.2.3,1.9.7s1.2.5,1.7,1,1,.8,1.4,1.5.5,1.4.5,2.2-.3,2-.8,2.9-1.4,1.5-2.4,1.9-2.2.7-3.7.7l.2-.2h-.1Z"/>
+    <path class="st2" d="M1228.2,345.2v-18.6h4.2l4.1,10.6c0,.3.2.7.3,1.2s.3,1,.5,1.5.3,1.2.5,1.7.3,1,.3,1.5h-.7c0-.3.2-.8.3-1.5s.3-1,.5-1.7.3-1,.5-1.5.3-.8.3-1.2l4.1-10.6h4.2v18.6h-2.9v-16.6h.2c0,.7-.3,1.2-.5,1.9s-.3,1.2-.5,1.9-.3,1.2-.5,1.7-.3.8-.5,1.2l-3.7,10h-2.4l-3.9-10c0-.3-.3-.7-.5-1.2s-.3-1-.5-1.7-.3-1.2-.5-1.9-.3-1.4-.7-1.9h.2v16.6h-2.7.3,0Z"/>
+  </g>
+</svg>
+  <span class="topbar-right">AI Training Library &nbsp;&bull;&nbsp; Internal use only</span>
+</header>
+
+<main class="main">
+  <h1 class="page-title">AI Training Library</h1>
+  <p class="page-sub">Resources to help the Pager Health team learn, use, and stay current on AI tools and practices.</p>
+
+  <!-- Spotlight -->
+  <div class="spotlight-section" id="spotlight-section">
+    <div class="spotlight-label">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;display:inline-block;vertical-align:middle;flex-shrink:0;color:var(--tangerine-dark);" aria-hidden="true"><path d='M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z'/></svg> Spotlight
+    </div>
+    <div class="spotlight-grid" id="spotlight-grid"></div>
+  </div>
+
+  <!-- Search -->
+  <div class="srow">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline-block;vertical-align:middle;flex-shrink:0;color:var(--text-muted);flex-shrink:0;" aria-hidden="true"><circle cx='10' cy='10' r='7'/><line x1='21' y1='21' x2='15' y2='15'/></svg>
+    <input type="text" id="search" placeholder="Search resources, topics, or tools&hellip;" oninput="render()"/>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this,'library')">Library</button>
+    <button class="tab" onclick="switchTab(this,'paths')">Learning paths</button>
+  </div>
+
+  <!-- Library tab -->
+  <div id="tab-library">
+    <div class="frow">
+      <span class="pill active" data-g="type" data-v="all" onclick="setFilter(this,'type','all')">All</span>
+      <span class="pill" data-g="type" data-v="internal" onclick="setFilter(this,'type','internal')">Internal</span>
+      <span class="pill" data-g="type" data-v="external" onclick="setFilter(this,'type','external')">External</span>
+      <div class="dvd"></div>
+      <span class="pill sbeg" data-g="level" data-v="Beginner" onclick="setFilter(this,'level','Beginner')">Beginner</span>
+      <span class="pill sint" data-g="level" data-v="Intermediate" onclick="setFilter(this,'level','Intermediate')">Intermediate</span>
+      <span class="pill sadv" data-g="level" data-v="Advanced" onclick="setFilter(this,'level','Advanced')">Advanced</span>
+      <div class="dvd"></div>
+      <span class="pill active" data-g="tool" data-v="all-tools" onclick="setFilter(this,'tool','all-tools')">All tools</span>
+      <span class="pill" data-g="tool" data-v="Copilot" onclick="setFilter(this,'tool','Copilot')">Copilot</span>
+      <span class="pill" data-g="tool" data-v="Claude" onclick="setFilter(this,'tool','Claude')">Claude</span>
+      <span class="pill" data-g="tool" data-v="General" onclick="setFilter(this,'tool','General')">General</span>
+    </div>
+    <div id="lc"></div>
+  </div>
+
+  <!-- Paths tab -->
+  <div id="tab-paths" style="display:none">
+    <div class="pgrid" id="pc"></div>
+  </div>
+
+  <footer class="footer">
+    &copy; 2026 Pager, Inc. d/b/a Pager Health. All rights reserved. &nbsp;&bull;&nbsp; Internal use only.
+  </footer>
+</main>
+
+<script>
+var SVGS = {"ti-adjust":"<circle cx='12' cy='12' r='9'/><line x1='14.5' y1='9' x2='14.5' y2='3'/><line x1='14.5' y1='21' x2='14.5' y2='14'/><line x1='9.5' y1='15' x2='9.5' y2='21'/><line x1='9.5' y1='3' x2='9.5' y2='10'/><line x1='12' y1='9' x2='17' y2='9'/><line x1='7' y1='15' x2='12' y2='15'/>","ti-alert-triangle":"<path d='M10.24 3.957l-8.422 14.06a1.989 1.989 0 0 0 1.7 2.983h16.845a1.989 1.989 0 0 0 1.7 -2.983l-8.423 -14.06a1.989 1.989 0 0 0 -3.4 0z'/><line x1='12' y1='9' x2='12' y2='13'/><line x1='12' y1='17' x2='12.01' y2='17'/>","ti-brain":"<path d='M15.5 13c.661 0 1.3 .168 1.862 .487l.138 .083a4 4 0 0 1 -3.5 7.13v.3a1 1 0 0 1 -2 0v-1h-1v1a1 1 0 0 1 -2 0v-.3a4 4 0 0 1 -3.5 -7.13l.138 -.082a3.5 3.5 0 0 1 4.862 -4.868v-.12a3.5 3.5 0 1 1 5 0v.3c.187 .077 .368 .167 .543 .268l-.043 -.032z'/>","ti-brand-windows":"<path d='M17.8 20l-12 -1.5c-.9 -.1 -1.8 -.9 -1.8 -1.9v-9.2c0 -1 .9 -1.8 1.8 -1.9l12 -1.5c1.2 -.1 2.2 .8 2.2 2v12c0 1.2 -1 2.1 -2.2 2z'/><line x1='12' y1='5' x2='12' y2='19'/><line x1='4' y1='12' x2='20' y2='12'/>","ti-building-hospital":"<line x1='9' y1='12' x2='15' y2='12'/><line x1='12' y1='9' x2='12' y2='15'/><path d='M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z'/>","ti-checkbox":"<polyline points='9 11 12 14 20 6'/><path d='M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9'/>","ti-clock":"<circle cx='12' cy='12' r='9'/><polyline points='12 7 12 12 15 15'/>","ti-file-description":"<path d='M14 3v4a1 1 0 0 0 1 1h4'/><path d='M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z'/><line x1='9' y1='13' x2='15' y2='13'/><line x1='9' y1='17' x2='15' y2='17'/><line x1='9' y1='9' x2='10' y2='9'/>","ti-heart-rate-monitor":"<path d='M3 12h4l3 -8l4 15l3 -9l2 2h2'/>","ti-link":"<path d='M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-2 2'/><path d='M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l2 -2'/>","ti-lock":"<rect x='5' y='11' width='14' height='10' rx='2'/><circle cx='12' cy='16' r='1'/><path d='M8 11v-4a4 4 0 0 1 8 0v4'/>","ti-message":"<path d='M8 9h8'/><path d='M8 13h6'/><path d='M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z'/>","ti-player-play":"<path d='M7 4v16l13 -8z'/>","ti-presentation":"<path d='M3 4l18 0'/><path d='M4 4l0 10a2 2 0 0 0 2 2l12 0a2 2 0 0 0 2 -2l0 -10'/><path d='M12 16l0 4'/><path d='M9 20l6 0'/><path d='M8 12l3 -3l2 2l3 -3'/>","ti-scale":"<path d='M7 20l10 0'/><path d='M12 20v-17'/><path d='M3 13l4 -9l4 9'/><path d='M17 13l4 -9l-4 9'/><path d='M3 13h8'/><path d='M13 13h8'/>","ti-search":"<circle cx='10' cy='10' r='7'/><line x1='21' y1='21' x2='15' y2='15'/>","ti-search-off":"<line x1='3' y1='3' x2='21' y2='21'/><path d='M5.818 5.818a7 7 0 0 0 9.364 9.364m1.44 -2.56a7 7 0 0 0 -8.24 -8.24'/><line x1='21' y1='21' x2='15' y2='15'/>","ti-seedling":"<path d='M12 10a6 6 0 0 0 -6 -6h-3v2a6 6 0 0 0 6 6h3'/><path d='M12 14a6 6 0 0 1 6 -6h3v1a6 6 0 0 1 -6 6h-3'/><line x1='12' y1='20' x2='12' y2='10'/>","ti-shield":"<path d='M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3'/>","ti-shield-check":"<path d='M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3'/><path d='M9 12l2 2l4 -4'/>","ti-world":"<circle cx='12' cy='12' r='9'/><line x1='3.6' y1='9' x2='20.4' y2='9'/><line x1='3.6' y1='15' x2='20.4' y2='15'/><path d='M11.5 3a17 17 0 0 0 0 18'/><path d='M12.5 3a17 17 0 0 1 0 18'/>","ti-star":"<path d='M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z'/>","ti-arrow-right":"<line x1='5' y1='12' x2='19' y2='12'/><polyline points='12 5 19 12 12 19'/>","ti-external-link":"<path d='M11 7h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5'/><line x1='10' y1='14' x2='20' y2='4'/><polyline points='15 4 20 4 20 9'/>"};
+function svgIcon(name,size,extra){
+  size=size||16;extra=extra||'';
+  var p=SVGS[name]||'';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:'+size+'px;height:'+size+'px;display:inline-block;vertical-align:middle;flex-shrink:0;'+extra+'" aria-hidden="true">'+p+'</svg>';
+}
+
+// ─── SPOTLIGHT ───────────────────────────────────────────────────────────────
+// Add spotlight items here. Each needs: title, desc, url, source, badge (optional label)
+var SPOTLIGHT = [
+  {
+    title:"Prompting essentials",
+    desc:"The foundational guide every team member should read before using any AI tool. Learn how to write clear, effective prompts.",
+    url:"https://ai.google.dev/gemini-api/docs/prompting-strategies",
+    source:"Google",
+    icon:"ti-message",
+    badge:"Start here"
+  },
+  {
+    title:"AI at Pager Health — overview deck",
+    desc:"Our AI strategy, approved tools, and acceptable use policy in one place. Required reading for all staff.",
+    url:"https://pagerhealth.sharepoint.com",
+    source:"SharePoint",
+    icon:"ti-presentation",
+    badge:"Required"
+  }
+];
+
+// ─── LIBRARY DATA ─────────────────────────────────────────────────────────────
+var DATA = [
+  {id:1,type:"internal",category:"Getting Started",title:"AI at Pager Health — overview deck",desc:"Intro slides covering our AI strategy, approved tools, and acceptable use policy.",icon:"ti-presentation",source:"SharePoint",url:"https://pagerhealth.sharepoint.com",level:"Beginner",tool:"General"},
+  {id:2,type:"internal",category:"Getting Started",title:"AI acceptable use policy",desc:"What you can and can’t do with AI tools. Required reading before enabling any AI feature.",icon:"ti-file-description",source:"SharePoint",url:"https://pagerhealth.sharepoint.com",level:"Beginner",tool:"General"},
+  {id:3,type:"internal",category:"Getting Started",title:"Help-IT onboarding walkthrough",desc:"Step-by-step guide to setting up and using the Help-IT Copilot agent.",icon:"ti-player-play",source:"MS Stream",url:"https://pagerhealth.sharepoint.com",level:"Beginner",tool:"Copilot"},
+  {id:4,type:"internal",category:"Security & Compliance",title:"AI data handling — HIPAA considerations",desc:"Internal guidance on handling PHI with AI tools, approved integrations, and BAA status.",icon:"ti-lock",source:"SharePoint",url:"https://pagerhealth.sharepoint.com",level:"Intermediate",tool:"General"},
+  {id:5,type:"internal",category:"Security & Compliance",title:"Incident response — AI-related events",desc:"How to identify and escalate an AI-related security or privacy incident.",icon:"ti-shield",source:"SharePoint",url:"https://pagerhealth.sharepoint.com",level:"Intermediate",tool:"General"},
+  {id:6,type:"internal",category:"Tooling",title:"Microsoft 365 Copilot — pilot guide",desc:"What’s in scope during the M365 Copilot pilot, feedback channel, and known limitations.",icon:"ti-brand-windows",source:"SharePoint",url:"https://pagerhealth.sharepoint.com",level:"Beginner",tool:"Copilot"},
+  {id:7,type:"internal",category:"Tooling",title:"Approved AI tools — current list",desc:"The live register of AI tools approved for use, including vendor, BAA status, and tier.",icon:"ti-checkbox",source:"Custom Record",url:"https://pagerhealth.sharepoint.com",level:"Beginner",tool:"General"},
+  {id:8,type:"external",category:"Foundations",title:"How large language models work",desc:"Google’s accessible explainer on how LLMs are trained and how they generate responses.",icon:"ti-brain",source:"Google",url:"https://developers.google.com/machine-learning/resources/intro-llms",level:"Beginner",tool:"General"},
+  {id:9,type:"external",category:"Foundations",title:"Prompting essentials",desc:"Google’s prompt engineering guide — clear, concise, and useful for non-technical staff.",icon:"ti-message",source:"Google",url:"https://ai.google.dev/gemini-api/docs/prompting-strategies",level:"Beginner",tool:"General"},
+  {id:10,type:"external",category:"Foundations",title:"AI hallucinations — what they are and why they happen",desc:"Plain-language article explaining model confabulation and how to spot it.",icon:"ti-alert-triangle",source:"Google",url:"https://cloud.google.com/discover/what-are-ai-hallucinations",level:"Beginner",tool:"General"},
+  {id:11,type:"external",category:"Foundations",title:"Test addition",desc:"Pager Health website.",icon:"ti-world",source:"pagerhealth.com",url:"https://pagerhealth.com",level:"Beginner",tool:"General",isNew:true},
+  {id:12,type:"external",category:"Healthcare AI",title:"AI in healthcare — risks and opportunities",desc:"Google Cloud’s overview of responsible AI in clinical and administrative healthcare contexts.",icon:"ti-heart-rate-monitor",source:"Google",url:"https://cloud.google.com/solutions/healthcare-life-sciences",level:"Intermediate",tool:"General"},
+  {id:13,type:"external",category:"Healthcare AI",title:"HIPAA and AI — what covered entities need to know",desc:"HHS guidance and third-party analysis on AI tool obligations under HIPAA.",icon:"ti-building-hospital",source:"HHS.gov",url:"https://www.hhs.gov/hipaa/index.html",level:"Intermediate",tool:"General"},
+  {id:14,type:"external",category:"Responsible Use",title:"Responsible AI practices — Google guide",desc:"Framework for thinking about fairness, bias, accountability, and safety in AI systems.",icon:"ti-scale",source:"Google",url:"https://ai.google/responsibility/responsible-ai-practices/",level:"Intermediate",tool:"General"},
+  {id:15,type:"external",category:"Responsible Use",title:"Understanding AI bias",desc:"Practical overview of how bias enters AI systems and how to mitigate it.",icon:"ti-adjust",source:"Google",url:"https://developers.google.com/machine-learning/fairness-overview",level:"Advanced",tool:"General"}
+];
+
+// ─── LEARNING PATHS ───────────────────────────────────────────────────────────
+// Steps link to matching DATA urls automatically by title match
+var PATHS = [
+  {icon:"ti-seedling",ib:"#f0fdf4",ic:"#166534",title:"New to AI",sub:"Beginner · 4 resources · ~45 min",
+    steps:["AI at Pager Health — overview deck","AI acceptable use policy","How large language models work","AI hallucinations — what they are and why they happen"],dur:"~45 min"},
+  {icon:"ti-brand-windows",ib:"var(--ai-magic-pale)",ic:"var(--ai-magic)",title:"Getting started with Copilot",sub:"Beginner · 3 resources · ~30 min",
+    steps:["Microsoft 365 Copilot — pilot guide","Help-IT onboarding walkthrough","Prompting essentials"],dur:"~30 min"},
+  {icon:"ti-shield-check",ib:"var(--plum-pale)",ic:"var(--plum)",title:"AI compliance essentials",sub:"Intermediate · 4 resources · ~60 min",
+    steps:["AI data handling — HIPAA considerations","HIPAA and AI — what covered entities need to know","Incident response — AI-related events","Responsible AI practices — Google guide"],dur:"~60 min"},
+  {icon:"ti-heart-rate-monitor",ib:"var(--tangerine-pale)",ic:"var(--tangerine-dark)",title:"AI in healthcare",sub:"Intermediate · 3 resources · ~45 min",
+    steps:["AI in healthcare — risks and opportunities","HIPAA and AI — what covered entities need to know","Responsible AI practices — Google guide"],dur:"~45 min"}
+];
+
+var SC={1:["var(--ai-magic-pale)","var(--ai-magic)"],2:["#f0fdf4","#166534"],3:["var(--tangerine-pale)","var(--tangerine-dark)"],4:["var(--plum-pale)","var(--plum)"]};
+var F={type:"all",level:"all",tool:"all-tools"};
+
+// Build a title->url lookup from DATA
+function urlForTitle(title){
+  for(var i=0;i<DATA.length;i++){
+    if(DATA[i].title===title) return DATA[i].url;
+  }
+  return '#';
+}
+
+function setFilter(el,g,v){
+  F[g]=F[g]===v?(g==="tool"?"all-tools":"all"):v;
+  document.querySelectorAll('.pill[data-g="'+g+'"]').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.pill[data-g="'+g+'"][data-v="'+F[g]+'"]').forEach(function(p){p.classList.add('active')});
+  render();
+}
+
+function switchTab(el,tab){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  document.getElementById('tab-library').style.display=tab==='library'?'':'none';
+  document.getElementById('tab-paths').style.display=tab==='paths'?'':'none';
+}
+
+function lvlBdg(l){
+  if(l==="Beginner") return '<span class="bdg bb">Beginner</span>';
+  if(l==="Intermediate") return '<span class="bdg bim">Intermediate</span>';
+  return '<span class="bdg bad">Advanced</span>';
+}
+
+function renderSpotlight(){
+  var sg=document.getElementById('spotlight-grid');
+  var ss=document.getElementById('spotlight-section');
+  if(!SPOTLIGHT.length){ss.style.display='none';return;}
+  var h='';
+  SPOTLIGHT.forEach(function(s){
+    var badge=s.badge?'<span class="spotlight-badge">'+s.badge+'</span>':'';
+    h+='<a class="spotlight-card" href="'+s.url+'" target="_blank" rel="noopener">';
+    h+='<div class="spotlight-card-top"><div class="spotlight-ico">'+svgIcon(s.icon,20,'color:rgba(255,255,255,0.9);')+'</div>'+badge+'</div>';
+    h+='<div class="spotlight-title">'+s.title+'</div>';
+    h+='<div class="spotlight-desc">'+s.desc+'</div>';
+    h+='<div class="spotlight-footer"><span class="spotlight-source">'+svgIcon('ti-link',12,'color:rgba(255,255,255,0.4);margin-right:3px;')+s.source+'</span>';
+    h+='<span class="spotlight-cta">Open '+svgIcon('ti-arrow-right',13,'color:rgba(255,255,255,0.7);')+'</span></div>';
+    h+='</a>';
+  });
+  sg.innerHTML=h;
+}
+
+function render(){
+  var q=document.getElementById('search').value.toLowerCase();
+  var filtered=DATA.filter(function(d){
+    return(F.type==="all"||d.type===F.type)
+      &&(F.level==="all"||d.level===F.level)
+      &&(F.tool==="all-tools"||d.tool===F.tool)
+      &&(!q||d.title.toLowerCase().indexOf(q)>-1||d.desc.toLowerCase().indexOf(q)>-1||d.category.toLowerCase().indexOf(q)>-1);
+  });
+  var groups={};
+  filtered.forEach(function(d){if(!groups[d.category])groups[d.category]=[];groups[d.category].push(d)});
+  var lc=document.getElementById('lc');
+  if(!filtered.length){
+    lc.innerHTML='<div class="empty">'+svgIcon("ti-search-off",32,"display:block;margin:0 auto 12px;color:var(--text-muted);")+'<br>No resources match those filters.</div>';
+  }else{
+    var h='';
+    Object.keys(groups).forEach(function(cat){
+      var items=groups[cat];
+      h+='<div class="slbl">'+cat+' <span class="cbadge">'+items.length+'</span></div><div class="cards">';
+      items.forEach(function(d){
+        var ic=d.type==='internal'?'ii':'ie';
+        var bc=d.type==='internal'?'bi':'be';
+        var bl=d.type==='internal'?'Internal':'External';
+        var nb=d.isNew?'<span class="bdg bn">New</span>':'';
+        h+='<a class="card'+(d.isNew?' nc':'')+'" href="'+d.url+'" target="_blank" rel="noopener">';
+        h+='<div class="ctop"><div class="cico '+ic+'">'+svgIcon(d.icon,18)+'</div>';
+        h+='<div class="bdgs"><span class="bdg '+bc+'">'+bl+'</span>'+lvlBdg(d.level)+nb+'</div></div>';
+        h+='<div class="ctitle">'+d.title+'</div>';
+        h+='<div class="cdesc">'+d.desc+'</div>';
+        h+='<div class="cmeta">'+svgIcon("ti-link",13)+' '+d.source+'<span class="mdot">&middot;</span>'+d.tool+'</div>';
+        h+='</a>';
+      });
+      h+='</div>';
+    });
+    lc.innerHTML=h;
+  }
+
+  // Render paths with linked steps
+  var ph='';
+  PATHS.forEach(function(p,pi){
+    ph+='<div class="pcard"><div class="phdr"><div class="pico" style="background:'+p.ib+';color:'+p.ic+'">'+svgIcon(p.icon,20)+'</div>';
+    ph+='<div><div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div></div></div>';
+    ph+='<div class="psteps">';
+    p.steps.forEach(function(stepTitle,si){
+      var c=SC[si+1]||["var(--plum-pale)","var(--plum)"];
+      var url=urlForTitle(stepTitle);
+      ph+='<div class="pstep"><div class="snum" style="background:'+c[0]+';color:'+c[1]+'">'+(si+1)+'</div>';
+      ph+='<a href="'+url+'" target="_blank" rel="noopener">'+stepTitle+' '+svgIcon('ti-external-link',11,'color:var(--text-muted);margin-left:2px;')+'</a></div>';
+    });
+    ph+='</div><div class="pftr"><span>'+svgIcon("ti-clock",13,"margin-right:4px;")+' '+p.dur+'</span></div></div>';
+  });
+  document.getElementById('pc').innerHTML=ph;
+}
+
+renderSpotlight();
+render();
+</script>
+</body>
+</html>
