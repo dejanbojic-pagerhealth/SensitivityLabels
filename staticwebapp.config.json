@@ -26,6 +26,11 @@
       "statusCode": 302
     },
     {
+      "route": "/ai-training-library",
+      "rewrite": "/ai-training-library.html",
+      "allowedRoles": ["authenticated"]
+    },
+    {
       "route": "/*",
       "allowedRoles": ["authenticated"]
     }
